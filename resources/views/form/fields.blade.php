@@ -13,14 +13,14 @@
 @elseif($layout->hasColumns())
     {!! $layout->build() !!}
 @else
-    @if($istrans && config('translatable.locale_array')) {{-- ¿ªÆô¶àÓïÑÔ and Ä£ÐÍÖÐÓÐ¶àÓïÑÔ×Ö¶Î --}}
+    @if($istrans && config('translatable.locale_array')) {{-- å¼€å¯å¤šè¯­è¨€ and æ¨¡åž‹ä¸­æœ‰å¤šè¯­è¨€å­—æ®µ --}}
         @if($localeForm == 'tab')
-            <!-- Tab ÏÔÊ¾¶àÓïÑÔ -->
+            <!-- Tab æ˜¾ç¤ºå¤šè¯­è¨€ -->
             <div>
                 <ul class="nav nav-tabs pl-1" style="margin-top: -1rem">
                     @foreach(config('translatable.locale_array') as $lang => $label)
                         <li class="nav-item">
-                            <a class="nav-link {{ $lang == 'zh_CN' ? 'active' : '' }}" href="#{{ $lang }}" data-toggle="tab">
+                            <a class="nav-link {{ $lang == config('app.locale') ? 'active' : '' }}" href="#{{ $lang }}" data-toggle="tab">
                                 {!! $label !!} &nbsp;<i class="feather icon-alert-circle has-tab-error text-danger d-none"></i>
                             </a>
                         </li>
@@ -30,7 +30,7 @@
                     @foreach(config('translatable.locale_array') as $lang => $label)
                         <div class="tab-pane {{ $lang == config('app.locale') ? 'active' : '' }}" id="{{ $lang }}">
                             @foreach($fields as $field)
-                                @if($lang == config('app.locale') || $field->getTranslatable()) {{-- Ö»ÔÚµÚÒ»¸ötabÖÐÏÔÊ¾·Ç¶àÓïÑÔ×Ö¶Î --}}
+                                @if($lang == config('app.locale') || $field->getTranslatable()) {{-- åªåœ¨ç¬¬ä¸€ä¸ªtabä¸­æ˜¾ç¤ºéžå¤šè¯­è¨€å­—æ®µ --}}
                                 {!! $field->setLocale($lang)->render() !!}
                                 @endif
                             @endforeach
