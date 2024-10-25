@@ -431,7 +431,7 @@ HTML;
     public function prepend($val)
     {
         $name = $this->name;
-        [$name, $lng] = Helpers::getColumnAndlng($name); // 获取: 字段+语言
+        [$name, $lng] = getColumnAndlng($name); // 获取: 字段+语言
 
         return $this->as(function ($v) use (&$val, $name) {
             if ($val instanceof \Closure) {
@@ -457,7 +457,7 @@ HTML;
     public function append($val)
     {
         $name = $this->name;
-        [$name, $lng] = Helpers::getColumnAndlng($name); // 获取: 字段+语言
+        [$name, $lng] = getColumnAndlng($name); // 获取: 字段+语言
 
         return $this->as(function ($v) use (&$val, $name) {
             if ($val instanceof \Closure) {

@@ -163,7 +163,7 @@ class Row implements Arrayable
     public function column($name, $value = null)
     {
         if (is_null($value)) {
-            $attr = Helpers::getArrValueByLocale($this->data, $name);//dump($attr);
+            $attr = getArrValueByLocale($this->data, $name);//dump($attr);
             return $this->output($attr);
         }
 

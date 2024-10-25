@@ -999,7 +999,7 @@ class Form implements Renderable
         foreach ($this->builder->fields() as $field) {
             $columns = $field->column();
 
-            [$columns, $lng] = Helpers::getColumnAndlng($columns); // 新增行, 处理掉[]和其内的内容
+            [$columns, $lng] = getColumnAndlng($columns); // 新增行, 处理掉[]和其内的内容
 
             // If column not in input array data, then continue.
             if (! Arr::has($updates, $columns) || Arr::has($prepared, $columns)) {

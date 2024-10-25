@@ -593,3 +593,38 @@ if (! function_exists('format_byte')) {
         return round($value, $dec).$prefix_arr[$i];
     }
 }
+
+// 多语言新增函数
+if (! function_exists('getColumnAndlng')) {
+    /**
+     * ---------------------------------------
+     * 获取列名和语言变量 "abc[cn]" => ["abc", "cn"]
+     *
+     * @param string $column
+     * @return array
+     * @author hlf <phphome@qq.com> 2024/10/11
+     */
+    function getColumnAndlng($column): array {
+        $lng = '';
+        if (is_array($column)) {
+            return [$column, $lng];
+        }
+        if (preg_match('/(\w+)\[(\w+)\]/', $column, $matches)) {
+            $column = $matches[1];
+            $lng = $matches[2];
+        }
+        return [$column, $lng];
+    }
+}
+
+// 多语言新增函数
+if (! function_exists('getArrValueByLocale')) {
+    function getArrValueByLocale($arr, $name){
+        $attr = Arr::get($arr, $name);//dump($attr);
+        $locale = config('app.locale');
+        if (is_array($attr) && Arr::has($attr, $locale)) {
+            $attr = Arr::get($attr, $locale);
+        }
+        return $attr;
+    }
+}
