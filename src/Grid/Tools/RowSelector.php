@@ -153,8 +153,16 @@ JS
     protected function getTitle($row, $id)
     {
         if ($key = $this->titleColumn) {
-            $label = Arr::get($row->toArray(), $key);
+            $_arr = $row->toArray();
+            $label = Arr::get($_arr, $key);
             if ($label !== null && $label !== '') {
+                $_locale = config('app.locale');
+                if (is_array($label) && Arr::has($label, $_locale)) {
+                    $label = Arr::get($label, $_locale);
+                    if ($label !== null && $label !== '') {
+                        return $label;
+                    }
+                }
                 return $label;
             }
 

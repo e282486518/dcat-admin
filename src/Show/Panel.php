@@ -58,7 +58,23 @@ class Panel implements Renderable
             'rows'   => $this->parent->rows(),
             'style'  => 'default',
             'title'  => trans('admin.detail'),
+            'istrans' => $this->isTranslatable()  // 新增view变量
         ];
+    }
+
+    /**
+     * ---------------------------------------
+     * 判断
+     * ---------------------------------------
+     */
+    public function isTranslatable(): bool {
+        if ($this->parent->repository()) {
+            $_model = $this->parent->repository()->model(); // 模型存在时, 取模型
+            if (!empty($_model->translatable)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

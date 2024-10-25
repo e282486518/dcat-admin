@@ -6,6 +6,7 @@ use Dcat\Admin\Admin;
 use Dcat\Admin\Form;
 use Dcat\Admin\Support\Helper;
 use Dcat\Admin\Traits\HasBuilderEvents;
+use Dcat\Admin\Traits\HasFieldTranslatable;
 use Dcat\Admin\Traits\HasVariables;
 use Dcat\Admin\Widgets\Form as WidgetForm;
 use Illuminate\Contracts\Support\Arrayable;
@@ -20,6 +21,7 @@ use Illuminate\Support\Traits\Macroable;
  */
 class Field implements Renderable
 {
+    use HasFieldTranslatable;
     use Macroable;
     use Form\Concerns\HasFieldValidator;
     use HasBuilderEvents;
@@ -697,7 +699,11 @@ class Field implements Renderable
         if (is_array($attribute)) {
             $this->attributes = array_merge($this->attributes, $attribute);
         } else {
-            $this->attributes[$attribute] = (string) $value;
+            if (is_array($value)) {
+                $this->attributes[$attribute] =  $value;
+            } else {
+                $this->attributes[$attribute] = (string) $value;
+            }
         }
 
         return $this;
@@ -821,7 +827,7 @@ class Field implements Renderable
      */
     protected function defaultPlaceholder()
     {
-        return trans('admin.input').' '.$this->label;
+        return trans('admin.input', [], $this->getLocale()).' '.$this->label;
     }
 
     /**
@@ -873,6 +879,25 @@ class Field implements Renderable
         $html = [];
 
         foreach ($this->attributes as $name => $value) {
+            // 判断当前字段的名称, 是否支持多语言
+            if ($this->getTranslatable()) {
+                if ($name == 'name') {
+                    // value=title[en]
+                    $value .= '['.$this->getLocale().']';
+                }
+                if ($name == 'placeholder') {
+                    // value=title[en]
+                    $value = $this->defaultPlaceholder();
+                }
+                if ($name == 'value' && is_array($value)) {
+                    // value=$value[en]
+                    if (Arr::has($value, $this->getLocale())) {
+                        $value = Arr::get($value, $this->getLocale(), json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+                    } else {
+                        $value = '';
+                    }
+                }
+            }
             $html[] = $name.'="'.e($value).'"';
         }
 
@@ -1146,12 +1171,18 @@ class Field implements Renderable
      */
     public function defaultVariables()
     {
+        //dump($this->attributes, $this->value, $this->formatAttributes(), $this->column, $this->form->model());
+        // 设置label多语言
+        if (!is_array($this->column) && $this->getLocale() != config('app.locale')) {
+            $this->label = str_replace('_', ' ', admin_trans_field($this->column, $this->getLocale()));
+        }
+
         return [
-            'name'        => $this->getElementName(),
+            'name'        => $this->getLocaleName($this->getElementName()),
             'help'        => $this->help,
             'class'       => $this->getElementClassString(),
-            'value'       => $this->value(),
-            'label'       => $this->label,
+            'value'       => $this->getLocaleValue($this->value()),
+            'label'       => $this->label.$this->getLocaleLabel(),
             'viewClass'   => $this->getViewElementClasses(),
             'column'      => $this->column,
             'errorKey'    => $this->getErrorKey(),
@@ -1343,5 +1374,80 @@ class Field implements Renderable
         $view = $this->render();
 
         return $view instanceof Renderable ? $view->render() : (string) $view;
+    }
+
+
+    /**
+     * ---------------------------------------
+     * 在 form 的 name 值后面加上 语言 属性, "name=abc" => "name=abc[zh_CN]"
+     *
+     * @return string|array
+     * @author hlf <phphome@qq.com> 2024/10/18
+     * ---------------------------------------
+     */
+    public function getLocaleValue($value) {
+        if (is_array($value) && $this->getTranslatable()) {
+            if (isset($value[$this->getLocale()])) {
+                return $value[$this->getLocale()];
+            }
+            return '';
+        }
+        return $value;
+    }
+
+    /**
+     * ---------------------------------------
+     * 在 form 的 name 值后面加上 语言 属性, "name=abc" => "name=abc[zh_CN]"
+     *
+     * @return string|array
+     * @author hlf <phphome@qq.com> 2024/10/18
+     * ---------------------------------------
+     */
+    public function getLocaleName($name) {
+        if (is_array($name)) {
+            return $name;
+        }
+        if ($this->getTranslatable()) {
+            return $name.'['.$this->getLocale().']';
+        }
+        return $name;
+    }
+
+    /**
+     * ---------------------------------------
+     * 在 form 的 label 值后面加上 语言 属性, "姓名" => "姓名[cn]"
+     *
+     * @return string
+     * @author hlf <phphome@qq.com> 2024/10/18
+     * ---------------------------------------
+     */
+    public function getLocaleLabel() {
+        if ($this->getTranslatable()) {
+            $_locale = $this->extractLocaleInfo($this->getLocale());
+            return '['.$_locale.']';
+        }
+        return '';
+    }
+
+    /**
+     * ---------------------------------------
+     * 取语言中的地图码
+     * zh_CN => cn,  en => en
+     *
+     * @param $locale
+     * @return string
+     * @author hlf <phphome@qq.com> 2024/10/18
+     * ---------------------------------------
+     */
+    function extractLocaleInfo($locale) {
+        // 查找下划线的位置
+        $underscorePosition = strpos($locale, '_');
+        if ($underscorePosition === false) {
+            // 如果没有下划线，则只有语言代码
+            return strtolower($locale);
+        } else {
+            // 如果有下划线，则分割字符串获取语言代码和区域代码
+            return strtolower(substr($locale, $underscorePosition + 1));
+        }
     }
 }

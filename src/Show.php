@@ -399,6 +399,17 @@ class Show implements Renderable
     {
         $field = new Field($name, $label);
 
+        // 设置该字段是否支持多语言
+        if ($this->repository()) {
+            $_model = $this->repository()->model(); // 模型存在时, 取模型
+            if (isset($_model->translatable)) {
+                $_fields = $_model->translatable?:[]; // 取多语言字段列表, 默认[]
+                if (in_array($name, $_fields)) {
+                    $field->setTranslatable(true);
+                }
+            }
+        }
+
         $field->setParent($this);
 
         $this->overwriteExistingField($name);

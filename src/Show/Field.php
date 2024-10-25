@@ -6,6 +6,7 @@ use Dcat\Admin\Admin;
 use Dcat\Admin\Show;
 use Dcat\Admin\Support\Helper;
 use Dcat\Admin\Traits\HasBuilderEvents;
+use Dcat\Admin\Traits\HasFieldTranslatable;
 use Dcat\Admin\Traits\HasVariables;
 use Dcat\Admin\Widgets\Dump;
 use Illuminate\Contracts\Support\Arrayable;
@@ -19,6 +20,7 @@ use Illuminate\Support\Traits\Macroable;
 
 class Field implements Renderable
 {
+    use HasFieldTranslatable;
     use HasBuilderEvents;
     use HasVariables;
     use Macroable {
@@ -428,6 +430,7 @@ HTML;
     public function prepend($val)
     {
         $name = $this->name;
+        [$name, $lng] = Helpers::getColumnAndlng($name); // 获取: 字段+语言
 
         return $this->as(function ($v) use (&$val, $name) {
             if ($val instanceof \Closure) {
@@ -453,6 +456,7 @@ HTML;
     public function append($val)
     {
         $name = $this->name;
+        [$name, $lng] = Helpers::getColumnAndlng($name); // 获取: 字段+语言
 
         return $this->as(function ($v) use (&$val, $name) {
             if ($val instanceof \Closure) {
@@ -698,6 +702,13 @@ HTML;
         });
     }
 
+    public function getValueByLocale() {
+        if (is_array($this->value)) {
+            return Arr::get($this->value, $this->getLocale(), '');
+        }
+        return $this->value;
+    }
+
     /**
      * Get all variables passed to field view.
      *
@@ -705,8 +716,10 @@ HTML;
      */
     protected function defaultVariables()
     {
+        $this->label = str_replace('_', ' ', admin_trans_field($this->name, $this->getLocale()));
+        // dump($this->value, $this->getLabel(), $this->getLocale());
         return [
-            'content' => $this->value,
+            'content' => $this->getValueByLocale(),
             'escape'  => $this->escape,
             'label'   => $this->getLabel(),
             'wrapped' => $this->border,

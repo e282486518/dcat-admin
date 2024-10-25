@@ -16,6 +16,7 @@ use Dcat\Admin\Http\JsonResponse;
 use Dcat\Admin\Support\Helper;
 use Dcat\Admin\Traits\HasBuilderEvents;
 use Dcat\Admin\Traits\HasFormResponse;
+use Dcat\Admin\Traits\HasFormTranslatable;
 use Dcat\Admin\Widgets\DialogForm;
 use Illuminate\Contracts\Support\MessageProvider;
 use Illuminate\Contracts\Support\Renderable;
@@ -91,6 +92,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class Form implements Renderable
 {
+    use HasFormTranslatable;
     use HasBuilderEvents;
     use HasFormResponse;
     use ResolveField;
@@ -997,6 +999,8 @@ class Form implements Renderable
         foreach ($this->builder->fields() as $field) {
             $columns = $field->column();
 
+            [$columns, $lng] = Helpers::getColumnAndlng($columns); // 新增行, 处理掉[]和其内的内容
+
             // If column not in input array data, then continue.
             if (! Arr::has($updates, $columns) || Arr::has($prepared, $columns)) {
                 continue;
@@ -1810,6 +1814,17 @@ class Form implements Renderable
             $column = Arr::get($arguments, 0, '');
 
             $element = new $className($column, array_slice($arguments, 1));
+
+            // 设置字段是否支持多语言
+            if ($this->repository()) {
+                $_model = $this->repository()->model(); // 模型存在时, 取模型
+                if (isset($_model->translatable)) {
+                    $_fields = $_model->translatable?:[]; // 取多语言字段列表, 默认[]
+                    if (in_array($column, $_fields)) {
+                        $element->setTranslatable(true);
+                    }
+                }
+            }
 
             $this->pushField($element);
 

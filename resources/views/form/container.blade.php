@@ -9,7 +9,13 @@
         @include('admin::form.tab', compact('tabObj', 'form'))
     @else
         <div class="fields-group">
-            @include('admin::form.fields', ['rows' => $form->rows(), 'fields' => $form->fields(), 'layout' => $form->layout()])
+            @include('translatable::form.fields', [
+                'rows' => $form->rows(),
+                'fields' => $form->fields(),
+                'layout' => $form->layout(),
+                'istrans' => $form->isTranslatable(),
+                'localeForm' => $form->form()->getLocaleForm()
+            ])
         </div>
     @endif
 </div>

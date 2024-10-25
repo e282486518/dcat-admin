@@ -162,9 +162,8 @@ class Row implements Arrayable
     public function column($name, $value = null)
     {
         if (is_null($value)) {
-            return $this->output(
-                Arr::get($this->data, $name)
-            );
+            $attr = Helpers::getArrValueByLocale($this->data, $name);//dump($attr);
+            return $this->output($attr);
         }
 
         if ($value instanceof Closure) {

@@ -774,4 +774,19 @@ JS
 
         return $html;
     }
+    
+    /**
+     * ---------------------------------------
+     * 判断
+     * ---------------------------------------
+     */
+    public function isTranslatable(): bool {
+        if ($this->form->repository()) {
+            $_model = $this->form->repository()->model(); // 模型存在时, 取模型
+            if (!empty($_model->translatable)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
