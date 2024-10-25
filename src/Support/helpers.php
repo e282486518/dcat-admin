@@ -619,6 +619,9 @@ if (! function_exists('getColumnAndlng')) {
 
 // 多语言新增函数
 if (! function_exists('getArrValueByLocale')) {
+    /**
+     * 从 model->toArray()中获取多语言字段的值, 相当于 $arr[$name]['en']
+     */
     function getArrValueByLocale($arr, $name){
         $attr = Arr::get($arr, $name);//dump($attr);
         $locale = config('app.locale');
