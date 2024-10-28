@@ -622,11 +622,15 @@ if (! function_exists('getArrValueByLocale')) {
     /**
      * 从 model->toArray()中获取多语言字段的值, 相当于 $arr[$name]['en']
      */
-    function getArrValueByLocale($arr, $name){
+    function getArrValueByLocale($arr, $name, $default = ''){
         $attr = Arr::get($arr, $name);//dump($attr);
         $locale = config('app.locale');
-        if (is_array($attr) && Arr::has($attr, $locale)) {
-            $attr = Arr::get($attr, $locale);
+        if (is_array($attr)) {
+            if (Arr::has($attr, $locale)) {
+                return Arr::get($attr, $locale);
+            } else {
+                return $default;
+            }
         }
         return $attr;
     }

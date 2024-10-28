@@ -163,8 +163,21 @@ class Row implements Arrayable
     public function column($name, $value = null)
     {
         if (is_null($value)) {
-            $attr = getArrValueByLocale($this->data, $name);//dump($attr);
-            return $this->output($attr);
+            // 存在多语言字段
+            if ($this->grid->model()->repository()) {
+                $_model = $this->grid->model()->repository()->model(); // 模型存在时, 取模型
+                if (isset($_model->translatable)) {
+                    $_fields = $_model->translatable?:[]; // 取多语言字段列表, 默认[]
+                    if (in_array($name, $_fields)) {
+                        $attr = getArrValueByLocale($this->data, $name);//dump($attr);
+                        return $this->output($attr);
+                    }
+                }
+            }
+            // 不存在做语言字段, 直接返回字段值
+            return $this->output(
+                Arr::get($this->data, $name)
+            );
         }
 
         if ($value instanceof Closure) {
