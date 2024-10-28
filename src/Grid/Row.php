@@ -5,6 +5,7 @@ namespace Dcat\Admin\Grid;
 use Closure;
 use Dcat\Admin\Grid;
 use Dcat\Admin\Helpers;
+use Dcat\Admin\Repositories\EloquentRepository;
 use Dcat\Admin\Support\Helper;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Htmlable;
@@ -154,6 +155,29 @@ class Row implements Arrayable
     }
 
     /**
+     * ---------------------------------------
+     * 判断当前模型是否支持多语言
+     *
+     * @return bool
+     * @author hlf <phphome@qq.com> 2024/10/28
+     * ---------------------------------------
+     */
+    public function isTranslatable() {
+        if ($this->grid->model()->repository()) {
+            $_rep = $this->grid->model()->repository(); // 取仓库
+            // 如果不是 EloquentRepository 就不可能有数据库多语言字段
+            if (! $_rep instanceof EloquentRepository) {
+                return false;
+            }
+            // 模型的 translatable 是否被定义
+            if (!empty($_rep->model()->translatable)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Get or set value of column in this row.
      *
      * @param  string  $name
@@ -164,15 +188,9 @@ class Row implements Arrayable
     {
         if (is_null($value)) {
             // 存在多语言字段
-            if ($this->grid->model()->repository()) {
-                $_model = $this->grid->model()->repository()->model(); // 模型存在时, 取模型
-                if (isset($_model->translatable)) {
-                    $_fields = $_model->translatable?:[]; // 取多语言字段列表, 默认[]
-                    if (in_array($name, $_fields)) {
-                        $attr = getArrValueByLocale($this->data, $name);//dump($attr);
-                        return $this->output($attr);
-                    }
-                }
+            if ($this->isTranslatable()) {
+                $attr = getArrValueByLocale($this->data, $name);//dump($attr);
+                return $this->output($attr);
             }
             // 不存在做语言字段, 直接返回字段值
             return $this->output(

@@ -897,6 +897,10 @@ class Field implements Renderable
                         $value = '';
                     }
                 }
+                // 去掉 required=1 验证字段
+                if ($name == 'required' && $this->getLocale() != config('app.locale')) {
+                    continue;
+                }
             }
             $html[] = $name.'="'.e($value).'"';
         }
@@ -1106,6 +1110,13 @@ class Field implements Renderable
      */
     public function getLabelClass()
     {
+        if ($this->getLocale() != config('app.locale')) {
+            $_labelClass = $this->labelClass;
+            if (in_array('asterisk', $_labelClass)) {
+                $_labelClass = array_values(array_diff($_labelClass, ['asterisk']));
+            }
+            return implode(' ', $_labelClass);
+        }
         return implode(' ', $this->labelClass);
     }
 
@@ -1171,14 +1182,16 @@ class Field implements Renderable
      */
     public function defaultVariables()
     {
-        //dump($this->attributes, $this->value, $this->formatAttributes(), $this->column, $this->form->model());
+        //dump($this->attributes, $this->value, $this->formatAttributes(), $this->column);
         // 设置label多语言
-        if (!is_array($this->column) && $this->getLocale() != config('app.locale')) {
-            $this->label = str_replace('_', ' ', admin_trans_field($this->column, $this->getLocale()));
+        if ($this->getLocale() != config('app.locale')) {
+            if (!is_array($this->column)) {
+                $this->label = str_replace('_', ' ', admin_trans_field($this->column, $this->getLocale()));
+            }
         }
 
         return [
-            'name'        => $this->getLocaleName($this->getElementName()),
+            'name'        => $this->getLocaleName($this->getElementName()), // name[zh_CN] OR name
             'help'        => $this->help,
             'class'       => $this->getElementClassString(),
             'value'       => $this->getLocaleValue($this->value()),

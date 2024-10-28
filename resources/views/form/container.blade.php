@@ -12,9 +12,7 @@
             @include('admin::form.fields', [
                 'rows' => $form->rows(),
                 'fields' => $form->fields(),
-                'layout' => $form->layout(),
-                'istrans' => $form->isTranslatable(),
-                'localeForm' => $form->form()->getLocaleForm()
+                'layout' => $form->layout()
             ])
         </div>
     @endif

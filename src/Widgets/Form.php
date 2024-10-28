@@ -606,6 +606,8 @@ class Form implements Renderable
             'elementId' => $this->getElementId(),
             'ajax'      => $this->ajax,
             'footer'    => $this->renderFooter(),
+            'istrans'    => false, // 模型是否有多语言字段
+            'localeForm' => 'line' // 多语言字段排列方式
         ], $this->variables);
     }
 

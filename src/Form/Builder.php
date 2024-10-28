@@ -687,6 +687,8 @@ class Builder implements FieldsCollection
             'fields'     => $this->fields(),
             'rows'       => $this->rows(),
             'layout'     => $this->layout(),
+            'istrans'    => $this->isTranslatable(), // 模型是否有多语言字段
+            'localeForm' => $this->form()->getLocaleForm() // 多语言字段排列方式
         ];
     }
 
@@ -774,7 +776,7 @@ JS
 
         return $html;
     }
-    
+
     /**
      * ---------------------------------------
      * 判断
