@@ -133,8 +133,19 @@ class File extends Field implements UploadFieldInterface
     protected function initialPreviewConfig()
     {
         $previews = [];
+        
+        $val = $this->value();
+        if ($this->getTranslatable()) {
+            // 多语言
+            if(is_array($val) && Arr::has($val, $this->getLocale())){
+                $val = Arr::get($val, $this->getLocale());
+            } else {
+                $val = '';
+            }
+            //dump($this->value(),$val,$this->getLocale());
+        }
 
-        foreach (Helper::array($this->value()) as $value) {
+        foreach (Helper::array($val) as $value) {
             $previews[] = [
                 'id'   => $value,
                 'path' => Helper::basename($value),
@@ -169,6 +180,15 @@ class File extends Field implements UploadFieldInterface
             'showUploadBtn' => ($this->options['autoUpload'] ?? false) ? false : true,
             'options'       => JavaScript::format($this->options),
         ]);
+        
+        // 多语言时, 设置其 class 中加入语言
+        
+        if ($this->getTranslatable()) {
+            $this->addVariables([
+                'class'    => $this->getElementClassString().' locale_'.$this->getLocale(),
+                'selector' => $this->getElementClassSelector().'.locale_'.$this->getLocale(),
+            ]);
+        }
 
         return parent::render();
     }
@@ -178,10 +198,25 @@ class File extends Field implements UploadFieldInterface
      */
     protected function formatValue()
     {
-        if ($this->value !== null) {
-            $this->value = implode(',', Helper::array($this->value));
-        } elseif (is_array($this->default)) {
-            $this->default = implode(',', $this->default);
+        if ($this->getTranslatable()) {
+            // 多语言
+            if ($this->value !== null) {
+                $locales = [];
+                foreach (config('translatable.locale_array') as $key => $_tmp) {
+                    $locales[$key] = implode(',', Helper::array(Arr::get($this->value, $key, '')));
+                }
+                //dump($locales, Arr::get($this->value, 'zh_CN'));
+                $this->value = $locales;
+            } elseif (is_array($this->default)) {
+                //$this->default = implode(',', $this->default);
+            }
+        } else {
+            // 非多语言
+            if ($this->value !== null) {
+                $this->value = implode(',', Helper::array($this->value));
+            } elseif (is_array($this->default)) {
+                $this->default = implode(',', $this->default);
+            }
         }
     }
 
