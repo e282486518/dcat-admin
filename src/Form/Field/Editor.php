@@ -28,12 +28,16 @@ class Editor extends Field
             'table',
             'autoresize',
             'codesample',
+            'formatpainter', // 添加格式刷插件
         ],
         'toolbar' => [
-            'undo redo | preview fullscreen | styleselect | fontsizeselect bold italic underline strikethrough forecolor backcolor | link image media blockquote removeformat codesample',
+            'undo redo | preview fullscreen | styleselect | fontsizeselect bold italic underline strikethrough forecolor backcolor | link image media blockquote removeformat codesample formatpainter',
             'alignleft aligncenter alignright  alignjustify| indent outdent bullist numlist table subscript superscript | code',
         ],
-        'min_height' => 400,
+        'min_height' => 400, // 最小高度
+        'max_height' => 800, // 添加最大高度限制
+        'autoresize_bottom_margin' => 20, // 自动调整大小时底部边距
+        'scrollbars' => true, // 当内容超出最大高度时显示滚动条
         'save_enablewhendirty' => true,
         'convert_urls' => false,
     ];
