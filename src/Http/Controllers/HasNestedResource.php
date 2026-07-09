@@ -3,6 +3,7 @@
 namespace Dcat\Admin\Http\Controllers;
 
 use Dcat\Admin\Layout\Content;
+use Illuminate\Support\Arr;
 
 trait HasNestedResource
 {
@@ -82,7 +83,7 @@ trait HasNestedResource
             return $this->routeParameterName;
         }
 
-        return $this->routeParameterName = last(request()->route()->parameterNames());
+        return $this->routeParameterName = Arr::last(request()->route()->parameterNames());
     }
 
     /**

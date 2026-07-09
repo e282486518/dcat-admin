@@ -3,6 +3,7 @@
 namespace Dcat\Admin\Support;
 
 use Dcat\Admin\Admin;
+use Illuminate\Support\Arr;
 
 class Translator
 {
@@ -104,7 +105,7 @@ class Translator
             return $this->translator->$method($key, $replace, $locale);
         }
 
-        return last(explode('.', $key));
+        return Arr::last(explode('.', $key));
     }
 
     protected function getTranslateMethod()

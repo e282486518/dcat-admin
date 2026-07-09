@@ -2,13 +2,14 @@
 
 namespace Dcat\Admin\Support;
 
+use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Output\Output;
 
 class StringOutput extends Output
 {
     public $output = '';
 
-    public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = false, $formatter = null)
+    public function __construct(int $verbosity = self::VERBOSITY_NORMAL, bool $decorated = false, ?OutputFormatterInterface $formatter = null)
     {
         $formatter = $formatter ?: new OutputFormatter();
 
@@ -20,7 +21,7 @@ class StringOutput extends Output
         $this->output = '';
     }
 
-    protected function doWrite($message, $newline)
+    protected function doWrite(string $message, bool $newline): void
     {
         $this->output .= $message.($newline ? "\n" : '');
     }

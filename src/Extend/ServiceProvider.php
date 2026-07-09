@@ -213,7 +213,7 @@ abstract class ServiceProvider extends LaravelServiceProvider
      */
     public function getLocalLatestVersion()
     {
-        return last(
+        return Arr::last(
             array_keys(Admin::extension()->versionManager()->getFileVersions($this))
         );
     }

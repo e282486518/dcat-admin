@@ -44,7 +44,7 @@ trait HasTranslations
     // setLocale 的静态方法
     public static function usingLocale(string $locale): self
     {
-        return (new self())->setLocale($locale);
+        return (new static())->setLocale($locale);
     }
 
 
@@ -197,7 +197,7 @@ trait HasTranslations
      * @author hlf <phphome@qq.com> 2024/10/24
      * ---------------------------------------
      */
-    public function getTranslations(string $key = null, array $allowedLocales = null): array
+    public function getTranslations(?string $key = null, ?array $allowedLocales = null): array
     {
         if ($key !== null) {
             $_attr = $this->getAttributes();
@@ -365,7 +365,7 @@ trait HasTranslations
      * @author hlf <phphome@qq.com> 2024/10/24
      * ---------------------------------------
      */
-    protected function filterTranslations(mixed $value = null, string $locale = null, array $allowedLocales = null): bool
+    protected function filterTranslations(mixed $value = null, ?string $locale = null, ?array $allowedLocales = null): bool
     {
         if ($value === null) {
             return false;

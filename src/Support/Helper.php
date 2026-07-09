@@ -954,7 +954,7 @@ class Helper
             return $name;
         }
 
-        return last(explode('/', $name));
+        return Arr::last(explode('/', $name));
     }
 
     /**

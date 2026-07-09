@@ -21,7 +21,7 @@ trait MenuCache
             return $builder();
         }
 
-        return $this->getStore()->remember($this->getCacheKey(), null, $builder);
+        return $this->getStore()->rememberForever($this->getCacheKey(), $builder);
     }
 
     /**
